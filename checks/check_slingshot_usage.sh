@@ -29,13 +29,17 @@ rawusage=$( wget  "${usage_url}"  -q -O - )
 usage=$( echo "$rawusage" | sed 's/,/\
 /g' | sed 's/=/\|/g' | grep DataUsedGB | sed 's/DataUsedGB|//')
 
+todaysent=$( echo "$rawusage" | sed 's/,/\
+/g' | sed 's/=/\|/g' | grep TodayDataSentTotalGB | sed 's/TodayDataSentTotalGB|//')
+
+todayreceived=$( echo "$rawusage" | sed 's/,/\
+/g' | sed 's/=/\|/g' | grep TodayDataRcvdTotalGB | sed 's/TodayDataRcvdTotalGB|//')
+
 usage_int=$( printf "%.0f" $usage )
 
 
 # Work out the return values
 if [ ${usage_error} -lt ${usage_int} ]; then
-        status=2
-        statustxt=CRITICAL
         status=2
         statustxt=CRITICAL
 elif [ "${usage_warn}" -lt "${usage_int}" ]; then
@@ -46,4 +50,5 @@ else
         statustxt=OK
 fi
 
-echo "Data usage $statustxt - used = ${usage}GB | usage=${usage}GB;${usage_warn};${usage_error};"
+echo "Data usage $statustxt - used = ${usage}GB | Monthly=${usage}GB;${usage_warn};${usage_error}; DailyUpload=${todaysent}GB; DailyDownload=${todayreceived}GB;"
+
